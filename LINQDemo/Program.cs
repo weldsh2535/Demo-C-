@@ -1,4 +1,5 @@
 ﻿using LINQDemo;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 class Program
@@ -209,9 +210,194 @@ class Program
             Console.WriteLine($"An employee record for {searchEmp.FirstName} {searchEmp.LastName} is found ");
         else
             Console.WriteLine($"An employee record for {searchEmp.FirstName} {searchEmp.LastName} is not found");
-       Console.ReadKey();
+        Console.WriteLine();
+        Console.WriteLine("OfType filter operator");
+        //OfType filter Operator
+        ArrayList mixed = GetHetrogeneousDataCollection();
+
+        Console.WriteLine();
+        Console.WriteLine("OfType filter String arraylist");
+        Console.WriteLine(" =============== ");
+        var stringRes = from s in mixed.OfType<string>()
+                        select s;
+        foreach (var item in stringRes)
+            Console.WriteLine(item);
+
+        Console.WriteLine();
+        Console.WriteLine("OfType filter operator int arraylist");
+        Console.WriteLine(" =============== ");
+        var intRes = from s in mixed.OfType<int>()
+                        select s;
+        foreach (var item in intRes)
+            Console.WriteLine(item);
+
+        Console.WriteLine();
+        Console.WriteLine("OfType filter operator employee arraylist");
+        Console.WriteLine(" =============== ");
+        var employeeRes = from s in mixed.OfType<Employee>()
+                        select s;
+        foreach (var item in employeeRes)
+            Console.WriteLine($"{item.FirstName,-10} {item.LastName,-10} {item.AnnualSalary}");
+        //ElemnetAt,ElementAtOrDefault,First,FirstDefault,Last,LastOrDefault,Single and SingleOrDefault
+        Console.WriteLine(" =============== ");
+       
+        var emps = employeeList.ElementAt(1);
+         Console.WriteLine($"{emps.FirstName,-10} {emps.LastName,-10} {emps.AnnualSalary}");
+        //First,FirstDefault,Last,LastOrDefault
+        Console.WriteLine("First =============== ");
+        List<int> integerList = new List<int> { 1,5, 20, 3,55 };
+        int result12 = integerList.First();
+        int result13 = integerList.Last();
+        int result14 = integerList.First(c => c % 2==0);
+        Console.WriteLine(result14);
+        Console.WriteLine(result13);
+        Console.WriteLine(" =============== ");
+        //Single and SingleOrDefault
+        Console.WriteLine(" =============== ");
+        var emp12 = employeeList.Single(c=>c.ID == 2);
+        Console.WriteLine($"{emp12.FirstName,-10} {emp12.LastName,-10} {emp12.AnnualSalary}");
+        //Equality Operator 
+        ///SequenceEqual
+        Console.WriteLine(" =============== ");
+        var integerList1 = new List<int> { 1,5, 20, 3,55 };
+        var integerLIst2 = new List<int> { 1,5,20, 30,55 };
+        var boolSequenceEqual = integerList1.SequenceEqual(integerLIst2);
+        Console.WriteLine(boolSequenceEqual);
+
+        Console.WriteLine(" =============== ");
+        var employeeListCompare = GetEmployees();
+        bool boolSE = employeeList.SequenceEqual(employeeListCompare,new EmployeeComparer());
+        Console.WriteLine(boolSE);
+        //Concatenation Operator
+        ///concat
+        Console.WriteLine(" =============== ");
+        var integerList12 = new List<int> { 1, 2, 20, 3, 55 };
+        var integerLIst22 = new List<int> { 10, 5, 0, 30, 15 };
+        IEnumerable<int> integerListConcat = integerList12.Concat(integerLIst22);
+
+        foreach (int integer in integerListConcat)
+            Console.WriteLine(integer);
+        Console.WriteLine(" =============== ");
+        ////Aggregate Operators -Aggregate,Average,Count,Sum and Max
+        ///Aggregate Operator
+        decimal totalAnnualSalary = employeeList.Aggregate<Employee, decimal>(0, (totalAnnualSalary, e) =>
+        {
+            var bonus = (e.IsManager) ? 0.04m : 0.02m;
+            totalAnnualSalary = (e.AnnualSalary + (e.AnnualSalary * bonus)) + totalAnnualSalary;
+            return totalAnnualSalary;
+        });
+    
+        Console.WriteLine($"Total Annual Salary of All employees(including bonus):{totalAnnualSalary}");
+        Console.WriteLine(" =============== ");
+        string data = employeeList.Aggregate<Employee, string>("Employee Annual Salaries (including bonus):",
+            (s, e) =>
+            {
+                var bonus = (e.IsManager) ? 0.04m : 0.02m;
+                s += $"{e.FirstName} {e.LastName} - {e.AnnualSalary + (e.AnnualSalary * bonus)},";
+                return s;
+            }
+           );
+        Console.WriteLine(data);
+        Console.WriteLine(" =============== ");
+        string data12 = employeeList.Aggregate<Employee, string ,string>("Employee Annual Salaries (including bonus):",
+            (s, e) =>
+            {
+                var bonus = (e.IsManager) ? 0.04m : 0.02m;
+                s += $"{e.FirstName} {e.LastName} - {e.AnnualSalary + (e.AnnualSalary * bonus)},";
+                return s;
+            }, s => s.Substring(0,s.Length - 2)
+           );
+        Console.WriteLine(data12);
+        ////Average
+        Console.WriteLine(" =============== ==============");
+        decimal average = employeeList.Average(e => e.AnnualSalary);
+        Console.WriteLine($"Average Annual Salary (Technology Department):{average}");
+
+        ///Count
+        Console.WriteLine(" =============== ==============");
+        int count = employeeList.Count(c=>c.DepartmentId ==2);
+        Console.WriteLine($"Employee numbers {count}");
+        ///Sum
+        Console.WriteLine(" =============== ==============");
+        decimal sums = employeeList.Sum(c=>c.AnnualSalary);
+        Console.WriteLine($"The sum of Employee: {sums}");
+        ///Max
+        Console.WriteLine(" =============== ==============");
+        int max = (int)employeeList.Max(c=>c.AnnualSalary);
+        Console.WriteLine($"The maximum of employee:{max}");
+        ///Generation Operators
+        ///DefaultEmpty
+        List<int> intList = new List<int>();
+        var newList = intList.DefaultIfEmpty();
+        Console.WriteLine($"DefaultEmpty {newList.ElementAt(0)}");
+
+        List<Employee> employee12 = new List<Employee>();
+        var newList1 = employee12.DefaultIfEmpty( new Employee { ID=0});
+        var result21 = newList1.ElementAt(0);
+        if(result21.ID == 0)
+        {
+            Console.WriteLine($"The list is empty");
+        }
+        ////Range
+        Console.WriteLine(" =============== ==============");
+        var intCollection = Enumerable.Range(2, 9);
+        foreach (var item in intCollection)
+            Console.WriteLine(item);
+        ////Conversion Operators - TolIst,ToDictionary,ToArray
+        Console.WriteLine(" =============== ==============");
+        //ToList
+        List<Employee> res21 = (from emp in employeeList
+                            where emp.AnnualSalary > 10000
+                            select emp).ToList();
+        foreach (var item in res21)
+            Console.WriteLine($"{item.FirstName,-10} {item.LastName,-10} {item.AnnualSalary}");
+        Console.WriteLine(" =============== ==============");
+        //ToDictionary
+        Dictionary<int,Employee> dictionary = (from emp in employeeList
+                                where emp.AnnualSalary > 10000
+                                select emp).ToDictionary<Employee,int>(e=>e.ID);
+        foreach (var key in dictionary.Keys)
+            Console.WriteLine($"Key:{key} ,Value {dictionary[key].FirstName,-10} {dictionary[key].LastName,-10} {dictionary[key].AnnualSalary}");
+
+        Console.WriteLine(" =============== ==============");
+        //ToArray List
+        Employee[] arrayList = (from emp in employeeList
+                                where emp.AnnualSalary > 10000  
+                                select emp).ToArray();
+        foreach (var item in arrayList)
+            Console.WriteLine($"{item.FirstName,-10} {item.LastName,-10} {item.AnnualSalary}");
+        ///Let
+        Console.WriteLine(" =============== ==============");
+        var result121 = from emp in employeeList
+                      let Initials = emp.FirstName.Substring(0, 1).ToUpper() + emp.LastName.Substring(0, 1).ToUpper()
+                      let AnnualSalaryBonus = (emp.IsManager) ? emp.AnnualSalary + (emp.AnnualSalary * 0.04m) : emp.AnnualSalary
+                      where Initials == "LG" || Initials == "ET" && AnnualSalaryBonus > 20000
+                      select new
+                      {
+                          Initials = Initials,
+                          FullName = emp.FirstName + " " + emp.LastName,
+                          AnnualSalaryPlusBouns = AnnualSalaryBonus
+                      };
+        foreach (var item in result121)
+            Console.WriteLine($"{item.Initials,-5} {item.FullName,-20} {item.AnnualSalaryPlusBouns,10}"); ;
+       
+        Console.ReadKey();
     }
 
+    public static ArrayList GetHetrogeneousDataCollection()
+    {
+        ArrayList arrayList = new ArrayList();
+        arrayList.Add(100);
+        arrayList.Add("Yosef Abebe");
+        arrayList.Add(200);
+        arrayList.Add(3000);
+        arrayList.Add("Ermiyas Debebe");
+        arrayList.Add(new Employee { ID = 9, FirstName = "Hana ", LastName = "Demeke", AnnualSalary = 30000, DepartmentId = 3, IsManager = false });
+        arrayList.Add(new Employee { ID = 10, FirstName = "Hilen ", LastName = "Tadese", DepartmentId = 2, AnnualSalary = 20000, IsManager = false });
+        arrayList.Add(new Department { Id = 4, LongName = "Information system", ShortName = "IS" });
+        arrayList.Add(new Department { Id = 5, LongName = "Managment", ShortName = "MA" });
+        return arrayList;
+    }
     public class EmployeeComparer : IEqualityComparer<Employee>
     {
         public bool Equals(Employee? x, Employee? y)
@@ -237,24 +423,24 @@ class Program
             ID = 1,
             FirstName = "Lakie",
             LastName = "Getie",
-            AnnualSalary = 20000,
+            AnnualSalary = 30000,
             IsManager = true,
             DepartmentId = 1
         };
         employees.Add(employee);
         Employee employee1 = new Employee
         {
-            ID = 1,
+            ID = 2,
             FirstName = "Eyob",
             LastName = "Tadese",
-            AnnualSalary = 50000,
+            AnnualSalary = 60000,
             IsManager = false,
             DepartmentId = 1
         };
         employees.Add(employee1);
         Employee employee2 = new Employee
         {
-            ID = 1,
+            ID = 3,
             FirstName = "Genenew",
             LastName = "Abayineh",
             AnnualSalary = 20000,
@@ -264,7 +450,7 @@ class Program
         employees.Add(employee2);
         Employee employee3 = new Employee
         {
-            ID = 1,
+            ID = 4,
             FirstName = "Shambel",
             LastName = "Kassa",
             AnnualSalary = 20000,
@@ -274,17 +460,17 @@ class Program
         employees.Add(employee3);
         Employee employee4 = new Employee
         {
-            ID = 1,
+            ID = 5,
             FirstName = "Gichie",
             LastName = "Kokobe",
-            AnnualSalary = 10000,
+            AnnualSalary = 20000,
             IsManager = false,
             DepartmentId = 2
         };
         employees.Add(employee4);
         Employee employee5 = new Employee
         {
-            ID = 1,
+            ID = 6,
             FirstName = "Hana",
             LastName = "Jed",
             AnnualSalary = 20000,
@@ -294,7 +480,7 @@ class Program
         employees.Add(employee5);
         Employee employee6 = new Employee
         {
-            ID = 1,
+            ID = 7,
             FirstName = "Robil",
             LastName = "Demeke",
             AnnualSalary = 20000,
@@ -304,7 +490,7 @@ class Program
         employees.Add(employee6);
         Employee employee7 = new Employee
         {
-            ID = 1,
+            ID = 8,
             FirstName = "Meskir",
             LastName = "Abebe",
             AnnualSalary = 20000,

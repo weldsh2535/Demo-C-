@@ -12,7 +12,7 @@ namespace LINQDemo
          public int  ID { get; set; }
          public string FirstName {get; set; }
          public string LastName {get; set; }
-          public double  AnnualSalary {get; set; }
+          public decimal  AnnualSalary {get; set; }
            public bool IsManager {get; set; }   
            public int  DepartmentId { get; set; }
     }
